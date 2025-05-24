@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Podcasted - Web Player</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header-row">
+        <div class="logo-title">
+          <img
+            src="https://store-images.s-microsoft.com/image/apps.13925.14487979042694345.5f0e6603-ff5e-49f6-aa11-078dcf2a0cd0.57dddffb-fdf5-42cc-b9bd-84a2468903a6?h=380"
+            alt="Podcast Logo"
+          />
+          <p>Podcasted</p>
+        </div>
+        <a
+          style="margin-left: 116px"
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://apps.microsoft.com/detail/9nxwgr2b1p26?cid=webplayer"
+          ><button style="font-weight: 500">Download App</button></a
+        >
+      </div>
+      <div id="podcastInfo" class="podcast-info" style="display: none">
+        <img id="podcastCover" class="cover" alt="Podcast Cover" />
+        <div class="meta">
+          <h3 id="podcastTitle"></h3>
+          <p id="podcastAuthor"></p>
+          <div hidden id="podcastDesc"></div>
+        </div>
+      </div>
+      <div class="input-group">
+        <input
+          type="url"
+          id="podUrlInput"
+          autocomplete="off"
+          placeholder="Enter Podcast's RSS URL"
+          onkeydown="handleRSSURLEnter(event)"
+          onfocus="this.select()"
+        />
+        <button class="button-white" onclick="loadPodcastList()">Load</button>
+      </div>
+      <ul id="episodeList"></ul>
+    </div>
+    <div id="searchDiv">
+      <div class="input-group">
+        <input
+          type="text"
+          id="searchInput"
+          autocomplete="off"
+          placeholder="Search Podcasts"
+          onfocus="this.select()"
+          onkeydown="handleSearchEnter(event)"
+        />
+        <button class="button-white" onclick="searchPodcasts()">Search</button>
+      </div>
+      <ul id="searchResults"></ul>
+    </div>
+
+    <div class="audio-player">
+      <audio id="player" controls></audio>
+      <button onclick="seekBackward()" class="control-btn">
+        <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M2.75 2.5a.75.75 0 0 0-.75.75v5.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 0-1.5H4.343C5.4 6.602 6.77 5.465 8.472 4.938a9.685 9.685 0 0 1 6.266.165c2.03.755 3.91 2.285 4.854 4.008a.75.75 0 0 0 1.316-.721c-1.143-2.083-3.33-3.831-5.647-4.693a11.185 11.185 0 0 0-7.233-.192C6.15 4.087 4.653 5.262 3.5 6.65V3.25a.75.75 0 0 0-.75-.75Zm6.203 8.528a.75.75 0 0 1 .547.722v8.5a.75.75 0 0 1-1.5 0v-6.417c-.382.369-.84.746-1.364 1.06a.75.75 0 1 1-.772-1.286c.676-.405 1.24-.965 1.643-1.44a8.244 8.244 0 0 0 .597-.798l.006-.009v-.001a.749.749 0 0 1 .843-.331Zm4.246 1.601c.554-.991 1.483-1.629 2.803-1.629 1.32 0 2.25.638 2.803 1.629.522.933.697 2.147.697 3.371 0 1.224-.175 2.438-.697 3.371-.554.991-1.483 1.629-2.803 1.629-1.32 0-2.25-.638-2.803-1.629-.522-.933-.697-2.147-.697-3.371 0-1.224.175-2.438.697-3.371Zm1.31.732c-.339.604-.507 1.516-.507 2.639 0 1.123.168 2.035.506 2.64.306.546.751.86 1.494.86s1.188-.314 1.494-.86c.338-.605.506-1.517.506-2.64 0-1.123-.168-2.035-.506-2.64-.306-.546-.751-.86-1.494-.86s-1.188.314-1.494.86Z"
+          />
+        </svg>
+      </button>
+      <button onclick="seekForward()" class="control-btn">
+        <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M21.25 2.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-.75.75h-5.5a.75.75 0 0 1 0-1.5h3.908c-1.058-1.398-2.428-2.536-4.13-3.062a9.685 9.685 0 0 0-6.266.165c-2.03.755-3.91 2.285-4.854 4.007a.75.75 0 1 1-1.315-.72c1.142-2.083 3.33-3.832 5.646-4.693a11.185 11.185 0 0 1 7.233-.192c1.879.581 3.375 1.756 4.528 3.144V3.25a.75.75 0 0 1 .75-.75ZM8.75 15.25c.763 0 1.253-.221 1.538-.475.284-.252.405-.57.395-.875-.018-.547-.54-1.4-2.183-1.4-.719 0-1.28.217-1.662.434a3.024 3.024 0 0 0-.527.378.76.76 0 0 0-.018.018h-.001A.75.75 0 0 1 5.204 12.3v-.002h.002l.002-.003.006-.006.016-.017.051-.05a4.527 4.527 0 0 1 .817-.593A4.848 4.848 0 0 1 8.5 11c2.208 0 3.63 1.271 3.682 2.85a2.611 2.611 0 0 1-1.02 2.15c.042.033.083.068.123.104.612.544.923 1.288.897 2.046C12.13 19.728 10.708 21 8.5 21a4.848 4.848 0 0 1-2.401-.629 4.536 4.536 0 0 1-.818-.593 2.16 2.16 0 0 1-.05-.05l-.017-.016-.006-.006-.002-.003h-.001l-.001-.002s-.466-.592.032-1.06a.75.75 0 0 1 1.056.028l.001.001a3.033 3.033 0 0 0 .545.396c.382.216.943.434 1.662.434 1.643 0 2.165-.854 2.183-1.4a1.113 1.113 0 0 0-.395-.876c-.285-.253-.775-.474-1.538-.474a.75.75 0 1 1 0-1.5Zm5.449-2.621c.554-.992 1.483-1.63 2.803-1.63 1.32 0 2.25.638 2.803 1.63.522.933.697 2.147.697 3.37 0 1.225-.175 2.438-.697 3.372-.554.991-1.483 1.629-2.803 1.629-1.32 0-2.25-.638-2.803-1.63-.522-.933-.697-2.146-.697-3.37 0-1.224.175-2.438.697-3.371Zm1.31.731c-.339.605-.507 1.516-.507 2.64 0 1.123.168 2.035.506 2.64.306.546.751.86 1.494.86s1.188-.314 1.494-.86c.338-.605.506-1.517.506-2.64 0-1.124-.168-2.035-.506-2.64-.306-.546-.751-.86-1.494-.86s-1.188.313-1.494.86Z"
+          />
+        </svg>
+      </button>
+      <p id="currentEpisodeTitle">🎙️</p>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
